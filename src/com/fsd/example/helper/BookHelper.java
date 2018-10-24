@@ -1,5 +1,6 @@
 package com.fsd.example.helper;
 
+import com.fsd.example.dao.BookDao;
 import com.fsd.example.model.Book;
 
 import java.io.IOException;
@@ -9,22 +10,17 @@ import java.util.*;
 
 public class BookHelper {
 
-    public static void searchByBook() throws IOException, ClassNotFoundException {
-        List<Book> bookList  = FileReadWriteHelper.readBooksFromFile();
+    public static void searchByBook() throws Exception {
+        int count  = BookDao.getAllBooks().size();
         List<Book> bookDetailsList  = new ArrayList<Book>();
-        if (bookList.isEmpty()) {
+        if (count==0) {
             System.out.println("There are no books in the system");
             return;
         }
         Scanner input = new Scanner(System.in);
         System.out.println("\nEnter title by which you want to search : ");
         String bookTitle = input.nextLine();
-        for (Book book:bookList){
-            if(bookTitle!=null && book.getTitle()!=null
-                && book.getTitle().toLowerCase().contains(bookTitle.toLowerCase())){
-                bookDetailsList.add(book);
-            }
-        }
+        bookDetailsList = BookDao.searchForBooks(bookTitle);
         if(bookDetailsList.isEmpty()){
             System.out.println("no books found for your search : "+bookTitle);
         }else{
@@ -33,31 +29,21 @@ public class BookHelper {
 
     }
 
-    public static void deleteBook() throws IOException, ClassNotFoundException {
-        List<Book> bookList  = FileReadWriteHelper.readBooksFromFile();
-        if (bookList.isEmpty()) {
+    public static void deleteBook() throws Exception{
+        int count  = BookDao.getAllBooks().size();
+        if (count==0) {
             System.out.println("There are no books in the system");
             return;
         }
         Scanner input = new Scanner(System.in);
         System.out.println("\nEnter title by which you want to delete : ");
         String bookTitle = input.nextLine();
-
-        int count=0;
-        ListIterator<Book> listIterator = bookList.listIterator();
-        while (listIterator.hasNext()){
-            Book book = listIterator.next();
-            if(book.getTitle().contains(bookTitle)){
-                listIterator.remove();
-                count++;
-            }
-        }
-        boolean status = FileReadWriteHelper.writeToFile(bookList,"writeBook", null);
-        System.out.println("Number of records deleted : "+count);
+        int rowsDeleted = BookDao.deleteBook(bookTitle);
+        System.out.println("Number of records deleted : "+rowsDeleted);
 
     }
 
-    public static void addBook() throws IOException, ClassNotFoundException {
+    public static void addBook() throws Exception {
         Scanner input = new Scanner(System.in);
         System.out.println("\n****************************"
                 + "\n**********ADD A BOOK********"
@@ -68,18 +54,9 @@ public class BookHelper {
         double price = enterBookPrice();
         int volume = enterBookVolume();
         LocalDate publishDate = parsePublishDate();
-        List<Book> bookList  = FileReadWriteHelper.readBooksFromFile();
-        Long bookId = null;
-        if(bookList!=null && !bookList.isEmpty()) {
-            Collections.sort(bookList);
-            bookId = bookList.get(bookList.size() - 1).getBookId()+1;
-        }else{
-            bookList = new ArrayList<Book>();
-            bookId=1l;
-        }
+        Long bookId = BookDao.getNextBookId();
         Book newBook = new Book(bookId,bookTitle,price,volume, publishDate);
-        bookList.add(newBook);
-        boolean status = FileReadWriteHelper.writeToFile(bookList,"writeBook", null);
+        boolean status = BookDao.addBook(newBook);
         System.out.println("\nBook Added "+status+" Id="+newBook.getBookId());
     }
 
@@ -122,5 +99,9 @@ public class BookHelper {
             parsePublishDate();
         }
         return publishDate;
+    }
+
+    public void createBookTableIfNotExists() throws Exception {
+        BookDao.createBookTable();
     }
 }

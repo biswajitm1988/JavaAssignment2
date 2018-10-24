@@ -19,6 +19,10 @@ public class Book implements Comparable, Serializable {
         this.publishDate = publishDate;
     }
 
+    public Book() {
+
+    }
+
     public Long getBookId() {
         return bookId;
     }

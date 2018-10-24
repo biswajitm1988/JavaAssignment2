@@ -32,6 +32,8 @@ public class BookMain {
                 SubjectHelper subjectHelper = new SubjectHelper();
                 BookHelper bookHelper = new BookHelper();
 
+                bookHelper.createBookTableIfNotExists();
+                subjectHelper.createSubjectTableIfNotExists();
                 switch (menuChoice) {
                     case 1:
                         SubjectHelper.addSubject();
