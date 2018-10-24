@@ -15,6 +15,6 @@ public class DBConnectionManager {
 
     public static void createConnection() throws Exception{
         Class.forName("org.h2.Driver").newInstance();
-        connection= DriverManager.getConnection("jdbc:h2:mem:test");
+        connection= DriverManager.getConnection("jdbc:h2:~/test","sa","");
     }
 }

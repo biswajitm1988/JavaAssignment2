@@ -8,7 +8,15 @@ import java.util.Scanner;
 
 public class BookMain {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws Exception {
+
+
+        SubjectHelper subjectHelper = new SubjectHelper();
+        BookHelper bookHelper = new BookHelper();
+
+        bookHelper.createBookTableIfNotExists();
+        subjectHelper.createSubjectTableIfNotExists();
+
         Scanner input = new Scanner(System.in);
         int menuChoice = 0;
         String pause;
@@ -28,12 +36,6 @@ public class BookMain {
                         + "\n\nPlease enter your selection and then press enter : ");
 
                 menuChoice = input.nextInt();
-
-                SubjectHelper subjectHelper = new SubjectHelper();
-                BookHelper bookHelper = new BookHelper();
-
-                bookHelper.createBookTableIfNotExists();
-                subjectHelper.createSubjectTableIfNotExists();
                 switch (menuChoice) {
                     case 1:
                         SubjectHelper.addSubject();

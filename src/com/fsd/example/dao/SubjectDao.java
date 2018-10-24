@@ -32,15 +32,17 @@ public class SubjectDao {
         preparedStatement.setString(2,newSubject.getSubtitle());
         preparedStatement.setInt(3,newSubject.getDurationInHours());
         int updateRows = preparedStatement.executeUpdate();
-        String addSubjectBookSql="insert into Subject_book (subject_book_id, subjectid, bookid) values ((select max(subject_book_id)+1 from subject_book),?,?)";
+        String addSubjectBookSql="insert into Subject_book (subjectid, bookid) values (?,?)";
         PreparedStatement  preparedStatement2 = DBConnectionManager.getConnection().prepareStatement(addSubjectBookSql);
 
         for(Book book:newSubject.getReferences()){
             preparedStatement2.setLong(1,newSubject.getSubjectId());
             preparedStatement2.setLong(2,book.getBookId());
+            preparedStatement2.addBatch();
         }
         preparedStatement2.executeBatch();
 
+        DBConnectionManager.getConnection().commit();
         return true;
     }
 
@@ -92,8 +94,7 @@ public class SubjectDao {
         stmt.close();
 
         String sqlSubjectBookRefCreate = "CREATE TABLE IF NOT EXISTS SUBJECT_BOOK"
-                + "  (SUBJECT_BOOK_ID           LONG PRIMARY KEY,"
-                + "   SUBJECTID            LONG ,"
+                + "  (SUBJECTID            LONG ,"
                 + "   BOOKID           LONG ,"
                 + "   FOREIGN KEY(SUBJECTID) REFERENCES SUBJECT(SUBJECTID) ON DELETE CASCADE,"
                 + "   FOREIGN KEY(BOOKID) REFERENCES BOOK(BOOKID) ON DELETE CASCADE)";
